@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/thom151/pokedexcli/internal"
 	"os"
+	"strings"
 )
 
 func startRepl() {
@@ -12,7 +14,9 @@ func startRepl() {
 		fmt.Print("Pokedex > ")
 		if scanner.Scan() {
 			input := scanner.Text()
-			if command, ok := getCommands()[input]; ok {
+			cleaned := cleanInput(input)
+
+			if command, ok := getCommands()[cleaned[0]]; ok {
 				err := command.callback()
 				if err != nil {
 					fmt.Println(err)
@@ -24,6 +28,12 @@ func startRepl() {
 			}
 		}
 	}
+}
+
+func cleanInput(str string) []string {
+	lower := strings.ToLower(str)
+	words := strings.Fields(lower)
+	return words
 }
 
 type cliCommand struct {
@@ -48,12 +58,7 @@ func getCommands() map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "shows next 20 poke location",
-			callback:    callMap,
-		},
-		"mapb": {
-			name:        "mapb",
-			description: "shows previous 20 poke location",
-			callback:    callMapB,
+			callback:    internal.CallMap,
 		},
 	}
 }
